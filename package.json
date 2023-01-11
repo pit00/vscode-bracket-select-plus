@@ -19,6 +19,9 @@
         "onCommand:bracket-select.select",
         "onCommand:bracket-select.select-include"
     ],
+    "extensionKind":[
+      "ui"
+    ],
     "main": "./out/src/bracketSelectMain",
     "contributes": {
         "commands": [
