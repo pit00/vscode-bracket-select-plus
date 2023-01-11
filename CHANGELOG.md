@@ -13,3 +13,6 @@
 - Support selection of ` `` `
 - Support multiple cursors selection
 - Support undo selections
+
+## [2.1.0]
+- Remove undo (use `ctrl+u` instead)

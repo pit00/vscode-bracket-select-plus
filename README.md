@@ -7,7 +7,7 @@ Really hope this plugin can help you!
 ## Quick start
 Just run command `BraSel:Select` or type `alt+a` to select text between brackets. If you wish to select more, just press it again.
 
-If you slected more than you want, at anytime, just press `alt+z`(undo selection), you will bring the previous selections back.
+If you slected more than you want, at anytime, just press <kbd>Ctrl</kbd>+<kbd>U</kbd> (Cursor Undo), you will bring the previous selections back.
 
 ![bracket-select-animation](bracket-select-undo.gif)
   

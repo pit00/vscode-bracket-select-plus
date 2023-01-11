@@ -27,21 +27,11 @@
                 "title": "BraSel:Select"
             },
             {
-                "command": "bracket-select.undo-select",
-                "title": "BraSel:UndoSelect"
-            },
-            {
                 "command": "bracket-select.select-include",
                 "title": "BraSel:SelectInclude"
             }
         ],
         "keybindings": [
-            {
-                "command": "bracket-select.undo-select",
-                "key": "alt+z",
-                "mac": "alt+z",
-                "when": "editorTextFocus"
-            },
             {
                 "command": "bracket-select.select",
                 "key": "alt+a",

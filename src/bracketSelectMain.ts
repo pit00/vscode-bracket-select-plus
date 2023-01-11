@@ -3,7 +3,6 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { bracketUtil } from './bracketUtil';
-import * as history from './selectionHistory';
 
 class SearchResult {
     bracket: string;
@@ -93,17 +92,11 @@ function isMatch(r1: SearchResult, r2: SearchResult) {
 
 function expandSelection(includeBrack: boolean) {
     const editor = vscode.window.activeTextEditor;
-    let originSelections = editor.selections;
 
-    let selections = originSelections.map((originSelection) => {
+    editor.selections = editor.selections.map((originSelection) => {
         const newSelect = selectText(includeBrack, originSelection)
         return newSelect ? toVscodeSelection(newSelect) : originSelection
     })
-
-    let haveChange = selections.findIndex((s, i) => !s.isEqual(originSelections[i])) >= 0
-    if (haveChange) {
-        history.changeSelections(selections);
-    }
 }
 
 function selectText(includeBrack: boolean, selection: vscode.Selection): { start: number, end: number } | void {
@@ -159,7 +152,6 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('bracket-select.select', function () {
             expandSelection(false);
         }),
-        vscode.commands.registerCommand('bracket-select.undo-select', history.unDoSelect),
         vscode.commands.registerCommand('bracket-select.select-include', function () {
             expandSelection(true);
         })
