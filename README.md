@@ -13,7 +13,7 @@ If you slected more than you want, at anytime, just press <kbd>Ctrl</kbd>+<kbd>U
   
 If you wish to select text including the brackets, just run `BraSel:Select Include Brackets` or type `cmd+alt+a` on mac and `ctrl+alt+a` on windows.
 
-This plugin is works for **multiple cursors**  now.
+This plugin also works for **multiple cursors**:
 ![bracket-select-animation](bracket-select.gif)
 
 ## Requirements
