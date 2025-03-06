@@ -2,17 +2,18 @@
 
 export namespace bracketUtil {
     let bracketParis = [
-        ["(", ")"], 
-        ["{", "}"], 
-        ["[", "]"]
+        ["(", ")"],
+        ["{", "}"],
+        ["[", "]"],
+        ["<", ">"]
     ]
 
-    let quoteBrackets = ['"', "'", "`"]
+    let quoteBrackets = ['"', "'", "`", "/"]
 
     export function isMatch(open: string, close: string): Boolean {
         if (isQuoteBracket(open)) {
             return open === close;
-        } 
+        }
         return bracketParis.findIndex(p => p[0] === open && p[1] === close) >= 0;
     }
 

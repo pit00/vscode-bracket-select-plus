@@ -1,8 +1,8 @@
 {
-    "name": "bracket-select-plus",
-    "displayName": "Bracket Select",
-    "description": "Quick select code between brackets, support for (), {}, [], '' and \"\"",
-    "version": "0.9.9",
+    "name": "brackets-selection-plus",
+    "displayName": "Brackets Selection",
+    "description": "Quick select code between brackets, support for (), {}, [], <>, '', \"\" and ``",
+    "version": "0.1.0",
     "publisher": "pit00",
     "icon": "icon.png",
     "engines": {
@@ -25,25 +25,23 @@
     "contributes": {
         "commands": [
             {
-                "command": "bracket-select-plus.select",
-                "title": "Brackets select"
+                "command": "brackets-selection-plus.select",
+                "title": "Brackets Select"
             },
             {
-                "command": "bracket-select-plus.select-include",
-                "title": "Brackets select include"
+                "command": "brackets-selection-plus.select-include",
+                "title": "Brackets Included Select"
             }
         ],
         "keybindings": [
             {
-                "command": "bracket-select-plus.select",
+                "command": "brackets-selection-plus.select",
                 "key": "alt+a",
-                "mac": "alt+a",
                 "when": "editorTextFocus"
             },
             {
-                "command": "bracket-select-plus.select-include",
+                "command": "brackets-selection-plus.select-include",
                 "key": "ctrl+alt+a",
-                "mac": "cmd+alt+a",
                 "when": "editorTextFocus"
             }
         ]

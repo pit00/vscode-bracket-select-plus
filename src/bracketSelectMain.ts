@@ -149,10 +149,10 @@ function selectText(includeBrack: boolean, selection: vscode.Selection): { start
 //Main extension point
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('bracket-select-plus.select', function () {
+        vscode.commands.registerCommand('brackets-selection-plus.select', function () {
             expandSelection(false);
         }),
-        vscode.commands.registerCommand('bracket-select-plus.select-include', function () {
+        vscode.commands.registerCommand('brackets-selection-plus.select-include', function () {
             expandSelection(true);
         })
     );
