@@ -5,7 +5,8 @@ export namespace bracketUtil {
         ["(", ")"],
         ["{", "}"],
         ["[", "]"],
-        ["<", ">"]
+        ["<", ">"],
+        [">", "<"]
     ]
 
     let quoteBrackets = ['"', "'", "`", "/"]

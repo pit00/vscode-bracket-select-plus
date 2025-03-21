@@ -1,8 +1,8 @@
 {
     "name": "brackets-selection-plus",
     "displayName": "Brackets Selection",
-    "description": "Quick select code between brackets, support for (), {}, [], <>, '', \"\" and ``",
-    "version": "0.1.0",
+    "description": "Quick select code between brackets and quotes",
+    "version": "0.1.2",
     "publisher": "pit00",
     "icon": "icon.png",
     "engines": {
