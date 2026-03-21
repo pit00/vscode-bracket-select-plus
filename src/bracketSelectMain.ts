@@ -1,163 +1,208 @@
 'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { bracketUtil } from './bracketUtil';
 
-class SearchResult {
-    bracket: string;
-    offset: number;
+type Pair = { open: string; close: string };
 
-    constructor(bracket: string, offset: number) {
-        this.bracket = bracket;
-        this.offset = offset;
-    }
-}
+// Order matters
+const PAIRS: Pair[] = [
+    { open: "<!--", close: "-->" },
 
-function findBackward(text: string, index: number): SearchResult {
-    const bracketStack: string[] = [];
-    for (let i = index; i >= 0; i--) {
-        let char = text.charAt(i);
-        // if it's a quote, we can not infer it is a open or close one
-        //so just return, this is for the case current selection is inside a string;
-        if (bracketUtil.isQuoteBracket(char) && bracketStack.length == 0) {
-            return new SearchResult(char, i);
-        }
-        if (bracketUtil.isOpenBracket(char)) {
-            if (bracketStack.length == 0) {
-                return new SearchResult(char, i);
-            } else {
-                let top = bracketStack.pop();
-                if (!bracketUtil.isMatch(char, top)) {
-                    throw 'Unmatched bracket pair';
-                }
+    { open: "/*", close: "*/" },
+    // { open: "//", close: "\n" },
+
+    { open: "/", close: "/" },
+
+    { open: "(", close: ")" },
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "<", close: ">" },
+    { open: ">", close: "<" },
+
+    { open: '"', close: '"' },
+    { open: "'", close: "'" },
+    { open: "`", close: "`" },
+];
+
+// ---------- helpers ----------
+
+function findNearestOpen(text: string, from: number) {
+    for (let i = from; i >= 0; i--) {
+        for (const pair of PAIRS) {
+            if (text.startsWith(pair.open, i)) {
+                return { pair, index: i };
             }
-        } else if (bracketUtil.isCloseBracket(char)) {
-            bracketStack.push(char);
-        }
-    }
-    //we are geting to the edge
-    return null;
-}
-
-function findForward(text: string, index: number): SearchResult {
-    const bracketStack: string[] = [];
-    for (let i = index; i < text.length; i++) {
-        let char = text.charAt(i);
-        if (bracketUtil.isQuoteBracket(char) && bracketStack.length == 0) {
-            return new SearchResult(char, i);
-        }
-        if (bracketUtil.isCloseBracket(char)) {
-            if (bracketStack.length == 0) {
-                return new SearchResult(char, i);
-            } else {
-                let top = bracketStack.pop();
-                if (!bracketUtil.isMatch(top, char)) {
-                    throw 'Unmatched bracket pair'
-                }
-            }
-        } else if (bracketUtil.isOpenBracket(char)) {
-            bracketStack.push(char);
         }
     }
     return null;
 }
 
-function showInfo(msg: string): void {
-    vscode.window.showInformationMessage(msg);
-}
+function findClose(text: string, from: number, pair: Pair) {
+    let i = from + pair.open.length;
 
-function getSearchContext(selection: vscode.Selection) {
-    const editor = vscode.window.activeTextEditor;
-    let selectionStart = editor.document.offsetAt(selection.start);
-    let selectionEnd = editor.document.offsetAt(selection.end);
-    return {
-        backwardStarter: selectionStart - 1, //coverage vscode selection index to text index
-        forwardStarter: selectionEnd,
-        text: editor.document.getText()
-    }
-}
+    // ---------- "/" (regex-like) ----------
+    if (pair.open === "/") {
+        let escaped = false;
 
-function toVscodeSelection({ start, end }: { start: number, end: number }): vscode.Selection {
-    const editor = vscode.window.activeTextEditor;
-    return new vscode.Selection(
-        editor.document.positionAt(start + 1), //convert text index to vs selection index
-        editor.document.positionAt(end)
-    );
-}
+        while (i < text.length) {
+            const ch = text[i];
 
-function isMatch(r1: SearchResult, r2: SearchResult) {
-    return r1 != null && r2 != null && bracketUtil.isMatch(r1.bracket, r2.bracket);
-}
+            if (!escaped && ch === "/") {
+                return i;
+            }
 
-function expandSelection(includeBrack: boolean) {
-    const editor = vscode.window.activeTextEditor;
-
-    editor.selections = editor.selections.map((originSelection) => {
-        const newSelect = selectText(includeBrack, originSelection)
-        return newSelect ? toVscodeSelection(newSelect) : originSelection
-    })
-}
-
-function selectText(includeBrack: boolean, selection: vscode.Selection): { start: number, end: number } | void {
-    const searchContext = getSearchContext(selection);
-    let { text, backwardStarter, forwardStarter } = searchContext;
-    if (backwardStarter < 0 || forwardStarter >= text.length) {
-        return;
-    }
-
-    let selectionStart: number, selectionEnd: number;
-    var backwardResult = findBackward(searchContext.text, searchContext.backwardStarter);
-    var forwardResult = findForward(searchContext.text, searchContext.forwardStarter);
-
-    while (forwardResult != null
-        && !isMatch(backwardResult, forwardResult)
-        && bracketUtil.isQuoteBracket(forwardResult.bracket)) {
-        forwardResult = findForward(searchContext.text, forwardResult.offset + 1);
-    }
-    while (backwardResult != null
-        && !isMatch(backwardResult, forwardResult)
-        && bracketUtil.isQuoteBracket(backwardResult.bracket)) {
-        backwardResult = findBackward(searchContext.text, backwardResult.offset - 1);
-    }
-
-    if (!isMatch(backwardResult, forwardResult)) {
-        showInfo('No matched bracket pairs found')
-        return;
-    }
-    // we are next to a bracket
-    // this is the case for doule press select
-    if (backwardStarter == backwardResult.offset && forwardResult.offset == forwardStarter) {
-        selectionStart = backwardStarter - 1;
-        selectionEnd = forwardStarter + 1;
-    } else {
-        if (includeBrack) {
-            selectionStart = backwardResult.offset - 1;
-            selectionEnd = forwardResult.offset + 1;
-        } else {
-            selectionStart = backwardResult.offset;
-            selectionEnd = forwardResult.offset;
+            escaped = !escaped && ch === "\\";
+            i++;
         }
+
+        return -1;
     }
-    return {
-        start: selectionStart,
-        end: selectionEnd,
+
+    // ---------- "><" chain ----------
+    if (pair.open === ">" && pair.close === "<") {
+        let lastValid = -1;
+
+        while (i < text.length) {
+            if (text[i] === "<") {
+                lastValid = i;
+
+                // extend chain if pattern continues
+                if (text[i + 1] === ">") {
+                    i += 2;
+                    continue;
+                }
+
+                return lastValid;
+            }
+            i++;
+        }
+
+        return lastValid;
+    }
+
+    // ---------- normal nesting ----------
+    const supportsNesting = pair.open !== pair.close;
+    let depth = 0;
+
+    while (i < text.length) {
+        // line comment
+        if (pair.open === "//" && text[i] === "\n") {
+            return i;
+        }
+
+        // nested open
+        if (supportsNesting && text.startsWith(pair.open, i)) {
+            depth++;
+            i += pair.open.length;
+            continue;
+        }
+
+        // close
+        if (text.startsWith(pair.close, i)) {
+            if (depth === 0) {
+                return i;
+            }
+            depth--;
+            i += pair.close.length;
+            continue;
+        }
+
+        i++;
+    }
+
+    return -1;
+}
+
+function findEnclosing(text: string, start: number, end: number) {
+    let cursor = start;
+
+    while (true) {
+        const open = findNearestOpen(text, cursor);
+        if (!open) return null;
+
+        const closeIndex = findClose(text, open.index, open.pair);
+
+        if (closeIndex === -1) {
+            cursor = open.index - 1;
+            continue;
+        }
+
+        const fullStart = open.index;
+        const fullEnd = closeIndex + open.pair.close.length;
+
+        const innerStart = fullStart + open.pair.open.length;
+        const innerEnd = closeIndex;
+
+        const isExactInner =
+            start === innerStart && end === innerEnd;
+
+        const isExactOuter =
+            start === fullStart && end === fullEnd;
+
+        // step 2 → include tokens
+        if (isExactInner) {
+            return {
+                start: fullStart,
+                end: fullEnd,
+                pair: open.pair
+            };
+        }
+
+        // step 3 → go outer
+        if (isExactOuter) {
+            cursor = open.index - 1;
+            continue;
+        }
+
+        // step 1 → go inside
+        if (fullStart <= start && fullEnd >= end) {
+            return {
+                start: innerStart,
+                end: innerEnd,
+                pair: open.pair
+            };
+        }
+
+        cursor = open.index - 1;
     }
 }
 
+// ---------- main ----------
 
-//Main extension point
+function expandSelection(editor: vscode.TextEditor) {
+    const doc = editor.document;
+
+    editor.selections = editor.selections.map(sel => {
+        const line = doc.lineAt(sel.active.line);
+        const text = line.text;
+
+        const lineStart = doc.offsetAt(line.range.start);
+
+        const start = doc.offsetAt(sel.start) - lineStart;
+        const end = doc.offsetAt(sel.end) - lineStart;
+
+        const found = findEnclosing(text, start, end);
+        if (!found) return sel;
+
+        return new vscode.Selection(
+            doc.positionAt(found.start + lineStart),
+            doc.positionAt(found.end + lineStart)
+        );
+    });
+}
+
+// ---------- extension ----------
+
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('brackets-selection-plus.select', function () {
-            expandSelection(false);
-        }),
-        vscode.commands.registerCommand('brackets-selection-plus.select-include', function () {
-            expandSelection(true);
-        })
+        vscode.commands.registerCommand(
+            'brackets-selection-plus.select',
+            () => {
+                const editor = vscode.window.activeTextEditor;
+                if (!editor) return;
+                expandSelection(editor);
+            }
+        )
     );
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {
-}
+export function deactivate() {}

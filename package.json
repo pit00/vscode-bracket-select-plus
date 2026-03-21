@@ -1,8 +1,8 @@
 {
     "name": "brackets-selection-plus",
-    "displayName": "Brackets Selection",
-    "description": "Quick select code between brackets and quotes",
-    "version": "0.1.3",
+    "displayName": "Brackets Selection Scope",
+    "description": "Select code between any brackets scopes",
+    "version": "0.2.6",
     "publisher": "pit00",
     "icon": "icon.png",
     "engines": {

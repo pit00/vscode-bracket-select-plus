@@ -1,0 +1,82 @@
+// ---------- BASIC ----------
+(a)
+{b}
+[c]
+<d>
+e > f < g
+
+// ---------- NESTED ----------
+foo(bar(baz(qux)))
+[a{b(c)d}e]
+<outer <inner> outer>
+
+// ---------- MIXED ----------
+(a[b{c<d>e}f]g)
+x > (y < z)
+
+// ---------- STRINGS ----------
+"hello"
+'world'
+`template`
+"nested 'quotes'"
+'more "quotes"'
+`template with ${value}`
+
+// ---------- COMMENTS ----------
+a /* inline comment */ b
+
+// ---------- REGEX STYLE ----------
+/abc/
+/a\/b/
+/test/g
+(a/b/c)
+
+//// multiple slashes
+
+// ---------- HTML ----------
+<!-- hello -->
+<div>test</div>
+<a href="link">text</a>
+
+// ---------- EDGE CASES ----------
+((((deep))))
+<<<<>>>>
+><><><
+
+// ---------- REALISTIC ----------
+function test(a, b) {
+    return (a + b) / (a / b);
+}
+
+const str = `value: ${a + (b * c)}`;
+
+if (a > b && c < d) {
+    console.log("ok");
+}
+
+// ---------- CURSOR TARGETS ----------
+// place cursor at each of these:
+
+// 1
+(a/b/c)
+
+// 2
+foo(bar(baz))
+
+// 3
+/* hello (world) */
+
+// 4
+"hello (world)"
+
+// 5
+a > b < c
+
+// 6
+/regex/g
+
+// 7
+<!-- test -->
+
+// 8
+[a{b(c)d}e]
