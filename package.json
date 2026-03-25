@@ -1,5 +1,5 @@
 {
-    "name": "brackets-selection-plus",
+    "name": "brackets-selection-redux",
     "displayName": "Brackets Selection Scope",
     "description": "Select code between any brackets scopes",
     "version": "0.2.6",
