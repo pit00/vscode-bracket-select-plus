@@ -30,6 +30,7 @@ a /* inline comment */ b
 /a\/b/
 /test/g
 (a/b/c)
+a / b / c
 
 //// multiple slashes
 

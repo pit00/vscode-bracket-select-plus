@@ -2,7 +2,7 @@
     "name": "brackets-selection-redux",
     "displayName": "Brackets Selection Scope",
     "description": "Select code between any brackets scopes",
-    "version": "0.2.6",
+    "version": "0.2.10",
     "publisher": "pit00",
     "icon": "icon.png",
     "engines": {
@@ -15,12 +15,8 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [
-        "onStartupFinished"
-    ],
-    "extensionKind":[
-        "ui"
-    ],
+    "activationEvents": [],
+    "extensionKind":["workspace"],
     "main": "./out/src/bracketSelectMain",
     "contributes": {
         "commands": [
@@ -44,7 +40,17 @@
                 "key": "ctrl+alt+a",
                 "when": "editorTextFocus"
             }
-        ]
+        ],
+        "configuration": {
+            "title": "Brackets Selection",
+            "properties": {
+                "bracketsSelection.maxScanLines": {
+                    "type": "number",
+                    "default": 80,
+                    "description": "Lines to scan above and below cursor"
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
