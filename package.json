@@ -1,8 +1,8 @@
 {
-    "name": "brackets-selection-redux",
-    "displayName": "Brackets Selection Scope",
+    "name": "brackets-scopes",
+    "displayName": "Brackets Scopes",
     "description": "Select code between any brackets scopes",
-    "version": "0.2.10",
+    "version": "0.3.0",
     "publisher": "pit00",
     "icon": "icon.png",
     "engines": {
